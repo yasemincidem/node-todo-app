@@ -27,10 +27,7 @@ const initialData = [
   },
 ];
 module.exports = function (app) {
-  app.get("/api/setup", function (req, res) {
-    Todo.create(initialData, function (err, results) {
-      if (err) throw err;
-      res.send(results);
-    });
+  app.get("/api/setup", async function (req, res) {
+    await Todo.create(initialData);
   });
 };
