@@ -7,4 +7,5 @@ const TodoSchema = new Schema({
     isDone: Boolean,
     hasAttachment: Boolean
 });
-mongoose.model('Todo', TodoSchema);
+const Todo = mongoose.model('Todo', TodoSchema);
+module.exports = Todo;
