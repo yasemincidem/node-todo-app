@@ -5,6 +5,13 @@ module.exports = function (app) {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
 
+  app.get("/api/todos", function (req, res) {
+    Todo.find({}, function (err, results) {
+      if (err) throw err;
+      res.send(results);
+    });
+  });
+
   // to get the usernames through the todo model
   app.get("/api/todos/:uname", function (req, res) {
     Todo.find({ userName: req.params.uname }, function (err, results) {
