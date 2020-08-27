@@ -63,22 +63,38 @@ const DeleteButtonWrapper = styled.div`
   flex: 1;
 `;
 const Todos = function () {
-  const [data, setData] = useState([]);
+  const [initialTodos, setInitialTodos] = useState([]);
+  const [selectedTodo, setSelectedTodo] = useState({});
   const classes = useStyles();
   useEffect(() => {
     axios
       .get('http://localhost:3000/api/todos')
       .then(function (response) {
-        setData(response.data);
+        setInitialTodos(response.data);
       })
       .catch(function (error) {
         throw error;
       });
   }, []);
-  const items = data?.map((item) => (
+  const setTodo = (selectedTodo) => (event) => {
+    const { userName, todo, hasAttachment } = selectedTodo;
+    const isDone = event.target.checked;
+    axios.post('http://localhost:3000/api/todo',{
+      userName,
+      todo,
+      isDone,
+      hasAttachment
+    }).then((function(response) {
+      const mappedTodos = initialTodos.map(todo => todo._id === selectedTodo._id ? ({...selectedTodo, isDone}) : todo);
+      console.log('mappedTodos', mappedTodos);
+      setInitialTodos(mappedTodos);
+    }))
+  };
+  const items = initialTodos?.map((item) => (
     <TodoContainer key={item._id}>
       <Checkbox
         checked={item.isDone}
+        onChange={setTodo(item)}
         inputProps={{ 'aria-label': 'Checkbox A' }}
       />
       {item.todo}
