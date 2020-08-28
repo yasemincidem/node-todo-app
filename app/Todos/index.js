@@ -6,7 +6,7 @@ import {
   OutlinedInput,
   FormControl,
   InputLabel,
-  InputAdornment
+  InputAdornment,
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { makeStyles } from '@material-ui/core/styles';
@@ -65,6 +65,7 @@ const DeleteButtonWrapper = styled.div`
 const Todos = function () {
   const [initialTodos, setInitialTodos] = useState([]);
   const [selectedTodo, setSelectedTodo] = useState({});
+  const [todoText, setTodoText] = useState('');
   const classes = useStyles();
   useEffect(() => {
     axios
@@ -79,24 +80,47 @@ const Todos = function () {
   const setTodo = (selectedTodo) => (event) => {
     const { userName, todo, hasAttachment, _id: id } = selectedTodo;
     const isDone = event.target.checked;
-    axios.post('http://localhost:3000/api/todo',{
-      id,
-      userName,
-      todo,
-      isDone,
-      hasAttachment
-    }).then((function(response) {
-      const mappedTodos = initialTodos.map(todo => todo._id === selectedTodo._id ? response.data : todo);
-      setInitialTodos(mappedTodos);
-    }))
+    axios
+      .post('http://localhost:3000/api/todo', {
+        id,
+        userName,
+        todo,
+        isDone,
+        hasAttachment,
+      })
+      .then(function (response) {
+        const mappedTodos = initialTodos.map((todo) =>
+          todo._id === selectedTodo._id ? response.data : todo,
+        );
+        setInitialTodos(mappedTodos);
+      });
   };
   const deleteTodo = (id) => {
-    axios.delete(`http://localhost:3000/api/todo/${id}`).then((function(response) {
-      const mappedTodos = initialTodos.filter(todo => todo._id !== id);
-      setInitialTodos(mappedTodos);
-    })).catch(function(err) {
-      throw err;
-    });
+    axios
+      .delete(`http://localhost:3000/api/todo/${id}`)
+      .then(function (response) {
+        const mappedTodos = initialTodos.filter((todo) => todo._id !== id);
+        setInitialTodos(mappedTodos);
+      })
+      .catch(function (err) {
+        throw err;
+      });
+  };
+  const postTodo = (todo) => {
+    axios
+      .post('http://localhost:3000/api/todo', {
+        userName: 'test',
+        todo,
+        isDone: false,
+        hasAttachment: false,
+      })
+      .then(function (response) {
+        setInitialTodos([...initialTodos, response.data]);
+        setTodoText('');
+      });
+  };
+  const handleChange = (event) => {
+    setTodoText(event.target.value);
   };
   const items = initialTodos?.map((item) => (
     <TodoContainer key={item._id}>
@@ -107,7 +131,11 @@ const Todos = function () {
       />
       {item.todo}
       <DeleteButtonWrapper>
-        <IconButton aria-label="delete" value="delete" onClick={() => deleteTodo(item._id)}>
+        <IconButton
+          aria-label="delete"
+          value="delete"
+          onClick={() => deleteTodo(item._id)}
+        >
           <DeleteIcon />
         </IconButton>
       </DeleteButtonWrapper>
@@ -119,14 +147,20 @@ const Todos = function () {
         <HeaderText>SAMPLE TODO APP</HeaderText>
       </Header>
       <FormControl variant="outlined" style={{ marginTop: 20 }}>
-          <InputLabel htmlFor="outlined-todo">Todo</InputLabel>
-          <OutlinedInput
-            id="outlined-todo"
-            value={null}
-            onChange={() => handleChange}
-            labelWidth={60}
-          />
-        </FormControl>
+        <InputLabel htmlFor="outlined-todo">Todo</InputLabel>
+        <OutlinedInput
+          id="outlined-todo"
+          value={todoText}
+          onChange={handleChange}
+          onKeyPress={(ev) => {
+            if (ev.key === 'Enter') {
+              postTodo(todoText);
+              ev.preventDefault();
+            }
+          }}
+          labelWidth={60}
+        />
+      </FormControl>
       <WrapperItems>{items}</WrapperItems>
     </Container>
   );
