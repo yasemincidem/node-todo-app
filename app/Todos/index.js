@@ -77,24 +77,22 @@ const Todos = function () {
       });
   }, []);
   const setTodo = (selectedTodo) => (event) => {
-    console.log('sss');
-    const { userName, todo, hasAttachment } = selectedTodo;
+    const { userName, todo, hasAttachment, _id: id } = selectedTodo;
     const isDone = event.target.checked;
     axios.post('http://localhost:3000/api/todo',{
+      id,
       userName,
       todo,
       isDone,
       hasAttachment
     }).then((function(response) {
-      const mappedTodos = initialTodos.map(todo => todo._id === selectedTodo._id ? ({...selectedTodo, isDone}) : todo);
+      const mappedTodos = initialTodos.map(todo => todo._id === selectedTodo._id ? response.data : todo);
       setInitialTodos(mappedTodos);
     }))
   };
   const deleteTodo = (id) => {
-    console.log('id deleted');
-    axios.delete('http://localhost:3000/api/todo',{id}).then((function(response) {
-      console.log('rresponse', response);
-      const mappedTodos = initialTodos.filter(todo => todo._id !== response.data._id);
+    axios.delete(`http://localhost:3000/api/todo/${id}`).then((function(response) {
+      const mappedTodos = initialTodos.filter(todo => todo._id !== id);
       setInitialTodos(mappedTodos);
     })).catch(function(err) {
       throw err;
@@ -125,7 +123,7 @@ const Todos = function () {
           <OutlinedInput
             id="outlined-todo"
             value={null}
-            onChange={() => console.log('changed')}
+            onChange={() => handleChange}
             labelWidth={60}
           />
         </FormControl>

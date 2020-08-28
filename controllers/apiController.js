@@ -1,11 +1,11 @@
-const bodyParser = require("body-parser");
-const Todo = require("../models/todo");
+const bodyParser = require('body-parser');
+const Todo = require('../models/todo');
 module.exports = function (app) {
   // using middleware to parse body
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
 
-  app.get("/api/todos", function (req, res) {
+  app.get('/api/todos', function (req, res) {
     Todo.find({}, function (err, results) {
       if (err) throw err;
       res.send(results);
@@ -13,21 +13,21 @@ module.exports = function (app) {
   });
 
   // to get the usernames through the todo model
-  app.get("/api/todos/:uname", function (req, res) {
+  app.get('/api/todos/:uname', function (req, res) {
     Todo.find({ userName: req.params.uname }, function (err, results) {
       if (err) throw err;
       res.send(results);
     });
   });
   // to get the ids through the todo model
-  app.get("/api/todo/:id", function (req, res) {
+  app.get('/api/todo/:id', function (req, res) {
     Todo.findById({ _id: req.params.id }, function (err, results) {
       if (err) throw err;
       res.send(results);
     });
   });
   // to post the new entry into todo model
-  app.post("/api/todo", function (req, res) {
+  app.post('/api/todo', function (req, res) {
     if (req.body.id) {
       Todo.findByIdAndUpdate(
         req.body.id,
@@ -37,10 +37,11 @@ module.exports = function (app) {
           isDone: req.body.isDone,
           hasAttachment: req.body.hasAttachment,
         },
+        { new: true },
         function (err, results) {
           if (err) throw err;
           res.send(results);
-        }
+        },
       );
     } else {
       Todo.create(
@@ -52,14 +53,15 @@ module.exports = function (app) {
         },
         function (err, results) {
           res.send(results);
-        }
+        },
       );
     }
   });
   // to delete the given todo
-  app.delete("/api/todo", function (req, res) {
-    Todo.findOneAndDelete({id : req.body.id}, function (err, results) {
+  app.delete('/api/todo/:id', function (req, res) {
+    Todo.findOneAndDelete({ _id: req.params.id }, function (err, results) {
       if (err) throw err;
+      console.log('results', results);
       res.send(results);
     });
   });
