@@ -77,6 +77,7 @@ const Todos = function () {
       });
   }, []);
   const setTodo = (selectedTodo) => (event) => {
+    console.log('sss');
     const { userName, todo, hasAttachment } = selectedTodo;
     const isDone = event.target.checked;
     axios.post('http://localhost:3000/api/todo',{
@@ -86,9 +87,18 @@ const Todos = function () {
       hasAttachment
     }).then((function(response) {
       const mappedTodos = initialTodos.map(todo => todo._id === selectedTodo._id ? ({...selectedTodo, isDone}) : todo);
-      console.log('mappedTodos', mappedTodos);
       setInitialTodos(mappedTodos);
     }))
+  };
+  const deleteTodo = (id) => {
+    console.log('id deleted');
+    axios.delete('http://localhost:3000/api/todo',{id}).then((function(response) {
+      console.log('rresponse', response);
+      const mappedTodos = initialTodos.filter(todo => todo._id !== response.data._id);
+      setInitialTodos(mappedTodos);
+    })).catch(function(err) {
+      throw err;
+    });
   };
   const items = initialTodos?.map((item) => (
     <TodoContainer key={item._id}>
@@ -99,7 +109,7 @@ const Todos = function () {
       />
       {item.todo}
       <DeleteButtonWrapper>
-        <IconButton aria-label="delete">
+        <IconButton aria-label="delete" value="delete" onClick={() => deleteTodo(item._id)}>
           <DeleteIcon />
         </IconButton>
       </DeleteButtonWrapper>
