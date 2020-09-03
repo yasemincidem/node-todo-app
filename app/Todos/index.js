@@ -62,6 +62,11 @@ const DeleteButtonWrapper = styled.div`
   display: flex;
   flex: 1;
 `;
+const NoMatch = styled.div`
+  display: flex;
+  justify-content: center;
+  font-size: 25px;
+`;
 const Todos = function () {
   const [initialTodos, setInitialTodos] = useState([]);
   const [selectedTodo, setSelectedTodo] = useState({});
@@ -77,7 +82,7 @@ const Todos = function () {
         throw error;
       });
   }, []);
-  const setTodo = (selectedTodo) => (event) => {
+  const postIsDone = (selectedTodo) => (event) => {
     const { userName, todo, hasAttachment, _id: id } = selectedTodo;
     const isDone = event.target.checked;
     axios
@@ -122,25 +127,29 @@ const Todos = function () {
   const handleChange = (event) => {
     setTodoText(event.target.value);
   };
-  const items = initialTodos?.map((item) => (
-    <TodoContainer key={item._id}>
-      <Checkbox
-        checked={item.isDone}
-        onChange={setTodo(item)}
-        inputProps={{ 'aria-label': 'Checkbox A' }}
-      />
-      {item.todo}
-      <DeleteButtonWrapper>
-        <IconButton
-          aria-label="delete"
-          value="delete"
-          onClick={() => deleteTodo(item._id)}
-        >
-          <DeleteIcon />
-        </IconButton>
-      </DeleteButtonWrapper>
-    </TodoContainer>
-  )) || <div>No matches todo</div>;
+  const items = initialTodos.length ? (
+    initialTodos.map((item) => (
+      <TodoContainer key={item._id}>
+        <Checkbox
+          checked={item.isDone}
+          onChange={postIsDone(item)}
+          inputProps={{ 'aria-label': 'Checkbox A' }}
+        />
+        {item.todo}
+        <DeleteButtonWrapper>
+          <IconButton
+            aria-label="delete"
+            value="delete"
+            onClick={() => deleteTodo(item._id)}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </DeleteButtonWrapper>
+      </TodoContainer>
+    ))
+  ) : (
+    <NoMatch>There are no matches data</NoMatch>
+  );
   return (
     <Container>
       <Header>

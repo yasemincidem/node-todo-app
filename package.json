@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --open --mode development",
+    "start": "nodemon app.js & webpack-dev-server --open --mode development",
     "lint": "eslint src -c .eslintrc.json --ext js,jsx"
   },
   "author": "",
